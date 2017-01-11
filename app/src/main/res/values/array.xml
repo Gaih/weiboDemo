@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="more">
+        <item>收藏</item>
+        <item>举报 </item>
+        <item>屏蔽</item>
+        <item>取消</item>
+    </string-array>
+</resources>

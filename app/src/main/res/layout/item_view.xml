@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="#e6e6e6"
+              android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/mTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/mPic"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="3dp"
+            android:background="@drawable/title"/>
+
+        <TextView
+            android:id="@+id/mName"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="3dp"
+            android:layout_toRightOf="@id/mPic"
+            android:gravity="center"
+            android:text="元气少女晴天"
+            android:textColor="@android:color/black"
+            android:textSize="16dp"/>
+
+        <TextView
+            android:id="@+id/mTime"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_below="@id/mName"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="2dp"
+            android:layout_toRightOf="@id/mPic"
+            android:text="1小时前"
+            android:textSize="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_below="@id/mName"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="2dp"
+            android:layout_toRightOf="@id/mTime"
+            android:text="来自weibo"
+            android:textSize="10dp"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/down"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <TextView
+            android:id="@+id/mContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
+            android:text="Drawable在我们平时的开发中，基本都会用到，而且给大家非常的有用"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/mContent"
+            android:layout_marginBottom="3dp"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/mSkip"
+                android:src="@mipmap/skip"
+                android:layout_weight="1"
+                android:background="#e6e6e6"
+                android:layout_height="30dp"
+                android:layout_width="wrap_content"/>
+
+            <ImageButton
+                android:id="@+id/mComments"
+                android:background="#e6e6e6"
+                android:layout_weight="1"
+                android:src="@mipmap/comments"
+                android:layout_height="30dp"
+                android:layout_width="wrap_content"/>
+
+            <ImageButton
+                android:id="@+id/mGood"
+                android:background="#e6e6e6"
+                android:layout_weight="1"
+                android:src="@mipmap/good"
+                android:layout_height="30dp"
+                android:layout_width="wrap_content"/>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+
+</LinearLayout>
