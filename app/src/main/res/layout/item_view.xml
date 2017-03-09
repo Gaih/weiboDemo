@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:paddingTop="3dp"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:background="#e6e6e6"
+              android:background="@android:color/white"
               android:orientation="vertical">
 
     <RelativeLayout
@@ -78,34 +79,34 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             android:layout_below="@id/mContent"
             android:layout_marginBottom="3dp"
-            android:layout_alignParentBottom="true"
             android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/mSkip"
-                android:src="@mipmap/skip"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
                 android:layout_weight="1"
                 android:background="#e6e6e6"
-                android:layout_height="30dp"
-                android:layout_width="wrap_content"/>
+                android:src="@mipmap/skip"/>
 
             <ImageButton
                 android:id="@+id/mComments"
-                android:background="#e6e6e6"
-                android:layout_weight="1"
-                android:src="@mipmap/comments"
+                android:layout_width="wrap_content"
                 android:layout_height="30dp"
-                android:layout_width="wrap_content"/>
+                android:layout_weight="1"
+                android:background="#e6e6e6"
+                android:src="@mipmap/comments"/>
 
             <ImageButton
                 android:id="@+id/mGood"
-                android:background="#e6e6e6"
-                android:layout_weight="1"
-                android:src="@mipmap/good"
+                android:layout_width="wrap_content"
                 android:layout_height="30dp"
-                android:layout_width="wrap_content"/>
+                android:layout_weight="1"
+                android:background="#e6e6e6"
+                android:src="@mipmap/good"/>
 
         </LinearLayout>
     </RelativeLayout>

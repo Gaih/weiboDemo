@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Spinner;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.List;
@@ -20,6 +20,7 @@ public class MyRecycleViewAdapter
 
     private Context mContext;
     private List<String> mData;
+
 
 
     public MyRecycleViewAdapter(List<String> data) {
@@ -44,9 +45,9 @@ public class MyRecycleViewAdapter
 
     @Override
     public void onBindViewHolder(MyRecycleViewAdapter.ViewHolder holder, int position) {
-        holder.textView.setText(mData.get(position)+position);
-    }
+        holder.mContent.setText(mData.get(position));
 
+    }
     @Override
     public int getItemCount() {
         return mData.size();
@@ -54,12 +55,17 @@ public class MyRecycleViewAdapter
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public TextView textView;
-        public Spinner mSpinner;
+        private TextView mContent;
+        private TextView mTime;
+        private ImageButton mImageButton;
         public ViewHolder(View itemView) {
             super(itemView);
-            textView = (TextView) itemView.findViewById(R.id.mContent);
-            textView.setOnClickListener(this);
+            mContent = (TextView) itemView.findViewById(R.id.mContent);
+            mImageButton = (ImageButton) itemView.findViewById(R.id.mPic);
+            mTime = (TextView) itemView.findViewById(R.id.mTime);
+            mTime.setOnClickListener(this);
+            mContent.setOnClickListener(this);
+            mImageButton.setOnClickListener(this);
         }
 
         @Override

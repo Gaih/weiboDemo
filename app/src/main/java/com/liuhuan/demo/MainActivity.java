@@ -3,45 +3,67 @@ package com.liuhuan.demo;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
-    private MyRecycleViewAdapter myRecycleViewAdapter;
-    private List<String> datas = new ArrayList<>();
+    //    private MyRecycleViewAdapter myRecycleViewAdapter;
+    private RefreshFootAdapter mRefreshFootAdapter;
+    private ArrayList<BlogInfo> datas = new ArrayList<>();
     private Spinner mSpinner;
-//    private ArrayAdapter<String> adapter;
-//    private static final String[] m=
-//            {"收藏","屏蔽","取消关注","举报","取消"};
-
+    private SwipeRefreshLayout mSwipe;
+    private int lastVisibleItem;
+    private String jsonStr;
+    private static final int SUCC = 0;//获取图片成功的标识
+    private static final int FAIL = 1;//获取图片成功的标识
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        init();
+        recycleInit();
+    }
 
+    private void init() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -58,36 +80,66 @@ public class MainActivity extends AppCompatActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-            this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        recycleInit();
     }
 
+    private Handler mHandler = new Handler() {
+        public void handleMessage(Message msg) {//此方法在ui线程运行
+            switch (msg.what) {
+                case SUCC:
+                    mRefreshFootAdapter.notifyDataSetChanged();
+                    break;
+                case FAIL:
+                    Toast.makeText(MainActivity.this, "无更新", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
 
     private void recycleInit() {
-        Button add = (Button) findViewById(R.id.button1);
-        Button delete = (Button) findViewById(R.id.button2);
-        add.setOnClickListener(this);
-        delete.setOnClickListener(this);
 
-        datas.add("之前大胜李世石的AlphaGo化名Master再次挑战人类，结果以60连胜的战绩横扫比赛，其中也包括现今棋力最强的柯洁。近日，柯洁接受采访坦言只剩震撼。柯洁表示，跟机器人对抗失败是非常正常的事情，现阶段AI依然有破绽，但是最终会战胜人类。作为人类，只要拼搏过了，输也没有遗憾。你认同柯洁的预言么？");
-        datas.add("【教育部：大中小学教材一律改为“十四年抗战”】为落实中央关于纪念中国抗日战争暨世界反法西斯战争胜利70周年有关精神，加强爱国主义教育，教育部组织历史专家进行了认真研究，对教材修改工作进行了全面部署，日前基础教育二司又专门发函对中小学地方教材修订提出了要求。具体内容戳图看！");
-        datas.add("Nokia 6 的诞生离不开这块铝合金，从打磨到成品需要耗时 12 小时，经过跌落测试得出，Nokia 从 1 米掉落百次以上也仅仅留下轻微划痕");
+        new Thread(runnable).start();
+        //下拉刷新
 
-        mRecyclerView = (RecyclerView)findViewById(R.id.mRecycleView);
+        mRecyclerView = (RecyclerView) findViewById(R.id.mRecycleView);
+
         mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        myRecycleViewAdapter = new MyRecycleViewAdapter(datas);
-        mRecyclerView.setAdapter(myRecycleViewAdapter);
-        mRecyclerView.addItemDecoration(new MyDecoration(this,MyDecoration.VERTICAL_LIST));
-        myRecycleViewAdapter.setOnItemClickListener(new MyRecycleViewAdapter.OnItemClickListener() {
+//        myRecycleViewAdapter = new MyRecycleViewAdapter(datas);
+        mRefreshFootAdapter = new RefreshFootAdapter(this, datas);
+        mRecyclerView.setAdapter(mRefreshFootAdapter);
+        mRecyclerView.addItemDecoration(new MyDecoration(this, MyDecoration.VERTICAL_LIST));
+        mSwipe = (SwipeRefreshLayout) findViewById(R.id.mSwipe);
+        mSwipe.setColorSchemeResources(R.color.google_blue, R.color.google_green, R.color.google_red, R.color.google_yellow);
+        mSwipe.setProgressViewOffset(false, 0, (int) TypedValue
+                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources()
+                        .getDisplayMetrics()));
+
+        mSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        new Thread(runnable).start();
+                        //数据重新加载完成后，提示数据发生改变，并且设置现在不在刷新
+//                        mRefreshFootAdapter.notifyDataSetChanged();
+                        mSwipe.setRefreshing(false);
+                    }
+                }, 4000);
+
+//                mSwipe.setRefreshing(false);
+            }
+        });
+        mRefreshFootAdapter.setOnItemClickListener(new RefreshFootAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(final View view, int position) {
                 view.animate()
@@ -103,37 +155,59 @@ public class MainActivity extends AppCompatActivity
                                         .start();
                             }
                         }).start();
+                switch (view.getId()) {
+
+                    case R.id.mPic:
+                        Toast.makeText(MainActivity.this, "头像", Toast.LENGTH_SHORT).show();
+                        ImageButton mPic = (ImageButton) view.findViewById(R.id.mPic);
+                        mPic.setBackground(getResources().getDrawable(R.drawable.ic_launcher));
+                        break;
+                    case R.id.mContent:
+                        Toast.makeText(MainActivity.this, "内容", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.mTime:
+                        TextView mTime = (TextView) view.findViewById(R.id.mTime);
+                        mTime.setText(new Date() + "");
+                }
             }
         });
-        
-    }
 
-    public void  add(View view){
-        datas.add("添加的测试微博~~~~~~~demo");
-        int position  = datas.size();
-        if (position > 0){
-            myRecycleViewAdapter.notifyDataSetChanged();
-        }
-    }
-    public void  delete(View view){
-        int position  = datas.size();
-        if (position >  0){
-            datas.remove(position - 1);
-            myRecycleViewAdapter.notifyDataSetChanged();
-        }
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem + 1 == mRefreshFootAdapter.getItemCount()) {
+                    mRefreshFootAdapter.changeMoreStatus(RefreshFootAdapter.LOADING_MORE);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<String> newDatas = new ArrayList<String>();
+                            for (int i = 0; i < 5; i++) {
+                                int index = i + 1;
+                                BlogInfo blogInfo = new BlogInfo();
+                                blogInfo.setContent("新添加的"+index);
+                                blogInfo.setPub_date(new Date().toString());
+                                blogInfo.setUser_id("The XXX");
+                                datas.add(blogInfo);
+                            }
+//                            mRefreshFootAdapter.addMoreItem(newDatas);
+                            mRefreshFootAdapter.changeMoreStatus(RefreshFootAdapter.PULLUP_LOAD_MORE);
+                        }
+                    }, 1000);
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                lastVisibleItem = mLinearLayoutManager.findLastVisibleItemPosition();
+            }
+        });
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.button1 :
-                add(view);
-                break;
-            case R.id.button2 :
-                delete(view);
-                break;
 
-        }
     }
 
 
@@ -193,4 +267,53 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    Runnable runnable = new Runnable() {
+
+        @Override
+        public void run() {//run()在新的线程中运行
+            try {
+                URL url = new URL("http://192.168.1.157:81/index.php");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(10000);
+                conn.setRequestMethod("GET");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+
+
+                // 输出返回结果
+                InputStream input = conn.getInputStream();
+                int resLen = 0;
+                byte[] res = new byte[1024];
+                StringBuilder sb = new StringBuilder();
+                while ((resLen = input.read(res)) != -1) {
+                    sb.append(new String(res, 0, resLen));
+                }
+                jsonStr = sb.toString();
+                //String转换成JSON
+                //Json的解析类对象
+                Log.d("数据库数据：", jsonStr);
+                JsonParser parser = new JsonParser();
+                //将JSON的String 转成一个JsonArray对象
+                JsonArray jsonArray = parser.parse(jsonStr).getAsJsonArray();
+
+                Gson gson = new Gson();
+//                ArrayList<BlogInfo> userBeanList = new ArrayList<>();
+                datas.clear();
+
+                //加强for循环遍历JsonArray
+                for (JsonElement user : jsonArray) {
+                    //使用GSON，直接转成Bean对象
+                    BlogInfo userBean = gson.fromJson(user, BlogInfo.class);
+                    Log.d("blog:", "info:" + userBean.getContent());
+                    datas.add(0, userBean);
+                }
+                mHandler.obtainMessage(SUCC, datas).sendToTarget();//向ui线程发送SUCCESS标识和数据
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
 }

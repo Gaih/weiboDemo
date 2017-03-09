@@ -11,28 +11,16 @@
     tools:context="com.liuhuan.demo.MainActivity"
     android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/mRecycleView"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/mSwipe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/mRecycleView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    </android.support.v7.widget.RecyclerView>
-
-    <LinearLayout
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/button1"
-            android:text="add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/button2"
-            android:text="delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+        </android.support.v7.widget.RecyclerView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
