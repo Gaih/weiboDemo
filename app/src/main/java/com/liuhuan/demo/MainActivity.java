@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -73,8 +72,71 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                final SendMess confirmDialog = new SendMess(MainActivity.this, "确定要退出吗?", "取消", "发送");
+                confirmDialog.show();
+                confirmDialog.setClicklistener(new SendMess.ClickListenerInterface() {
+                    @Override
+                    public void doConfirm() {
+
+//                        //创建okHttpClient对象 get方法
+//                        OkHttpClient mOkHttpClient = new OkHttpClient();
+////创建一个Request
+//                        String hi = "{\n" +
+//                                "    \"id\": \"17999030\",\n" +
+//                                "    \"method\": \"sayHello\",\n" +
+//                                "    \"jsonrpc\": \"2.0\",\n" +
+//                                "    \"params\": \n" +
+//                                "        {\n" +
+//                                "            \"acmac\": \"00E0614CA7C6\",\n" +
+//                                "            \"acconf_version\": \"2015-10-28-09-45\"\n" +
+//                                "        }\n" +
+//                                "    }";
+//                        RequestBody formBody = RequestBody.create(JSON,hi);
+////                                new FormBody.Builder()
+////                                .add("account", "android")
+////                                .add("password", "bug")
+////                                .add("username", "XXXX")
+////                                .add("pic", "XXXXX")
+////                                .add("sex", "XXXXX")
+////                                .build();
+//
+//                        Log.d("11111",formBody.toString());
+//
+//                        final Request request = new Request.Builder()
+//                                .url("http://192.168.1.157:81/php/index.php")
+//                                .post(formBody)
+//                                .build();
+////new call
+//                        Call call = mOkHttpClient.newCall(request);
+////请求加入调度
+//                        call.enqueue(new Callback() {
+//                            @Override
+//                            public void onFailure(Call call, IOException e) {
+//                                Log.d("22222", "22222");
+//
+//                            }
+//
+//                            @Override
+//                            public void onResponse(Call call, Response response) throws IOException {
+//                                // 输出返回结果
+//                                Log.d("11111", "11111");
+//
+//                            }
+//                        });
+
+                        confirmDialog.dismiss();
+
+                    }
+
+                    @Override
+                    public void doCancel() {
+                        confirmDialog.dismiss();
+                    }
+                });
+
+
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
             }
         });
 
@@ -116,7 +178,7 @@ public class MainActivity extends AppCompatActivity
 //        myRecycleViewAdapter = new MyRecycleViewAdapter(datas);
         mRefreshFootAdapter = new RefreshFootAdapter(this, datas);
         mRecyclerView.setAdapter(mRefreshFootAdapter);
-        mRecyclerView.addItemDecoration(new MyDecoration(this, MyDecoration.VERTICAL_LIST));
+//        mRecyclerView.addItemDecoration(new MyDecoration(this, MyDecoration.VERTICAL_LIST));
         mSwipe = (SwipeRefreshLayout) findViewById(R.id.mSwipe);
         mSwipe.setColorSchemeResources(R.color.google_blue, R.color.google_green, R.color.google_red, R.color.google_yellow);
         mSwipe.setProgressViewOffset(false, 0, (int) TypedValue
@@ -185,7 +247,7 @@ public class MainActivity extends AppCompatActivity
                             for (int i = 0; i < 5; i++) {
                                 int index = i + 1;
                                 BlogInfo blogInfo = new BlogInfo();
-                                blogInfo.setContent("新添加的"+index);
+                                blogInfo.setContent("新添加的" + index);
                                 blogInfo.setPub_date(new Date().toString());
                                 blogInfo.setUser_id("The XXX");
                                 datas.add(blogInfo);
@@ -193,7 +255,7 @@ public class MainActivity extends AppCompatActivity
 //                            mRefreshFootAdapter.addMoreItem(newDatas);
                             mRefreshFootAdapter.changeMoreStatus(RefreshFootAdapter.PULLUP_LOAD_MORE);
                         }
-                    }, 1000);
+                    }, 500);
                 }
             }
 
@@ -273,14 +335,46 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void run() {//run()在新的线程中运行
             try {
-                URL url = new URL("http://192.168.1.157:81/index.php");
+
+//                //创建okHttpClient对象 get方法
+//                OkHttpClient mOkHttpClient = new OkHttpClient();
+////创建一个Request
+//                final Request request = new Request.Builder()
+//                        .url("http://192.168.1.157:81/php/index.php")
+//                        .build();
+////new call
+//                Call call = mOkHttpClient.newCall(request);
+////请求加入调度
+//                call.enqueue(new Callback()
+//                {
+//                    @Override
+//                    public void onFailure(Call call, IOException e) {
+//                        Log.d("22222","22222");
+//
+//                    }
+//                    @Override
+//                    public void onResponse(Call call, Response response) throws IOException {
+//                        // 输出返回结果
+//                        InputStream input = response.body().byteStream();
+//                        int resLen = 0;
+//                        byte[] res = new byte[1024];
+//                        StringBuilder sb = new StringBuilder();
+//                        while ((resLen = input.read(res)) != -1) {
+//                            sb.append(new String(res, 0, resLen));
+//                        }
+//                        jsonStr = sb.toString();
+//                        Log.d("11111","11111"+jsonStr);
+//
+//                    }
+//                });
+
+
+                URL url = new URL("http://192.168.1.157:81/php/index.php");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setConnectTimeout(10000);
                 conn.setRequestMethod("GET");
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
-
-
                 // 输出返回结果
                 InputStream input = conn.getInputStream();
                 int resLen = 0;

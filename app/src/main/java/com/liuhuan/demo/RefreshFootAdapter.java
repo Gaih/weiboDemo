@@ -104,7 +104,7 @@ public class RefreshFootAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
     @Override
     public int getItemCount() {
-        return mData.size()+1;
+        return mData.size();
     }
     //自定义的ViewHolder，持有每个Item的的所有界面元素
     public static class ItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
