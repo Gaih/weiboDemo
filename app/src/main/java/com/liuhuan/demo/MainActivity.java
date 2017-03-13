@@ -21,6 +21,7 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -31,12 +32,21 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
@@ -53,11 +63,13 @@ public class MainActivity extends AppCompatActivity
     private static final int SUCC = 0;//获取图片成功的标识
     private static final int FAIL = 1;//获取图片成功的标识
 
+    private EditText mEdit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+//        Login.mDialog.cancel();
         init();
         recycleInit();
     }
@@ -77,59 +89,15 @@ public class MainActivity extends AppCompatActivity
                 confirmDialog.setClicklistener(new SendMess.ClickListenerInterface() {
                     @Override
                     public void doConfirm() {
-
-//                        //创建okHttpClient对象 get方法
-//                        OkHttpClient mOkHttpClient = new OkHttpClient();
-////创建一个Request
-//                        String hi = "{\n" +
-//                                "    \"id\": \"17999030\",\n" +
-//                                "    \"method\": \"sayHello\",\n" +
-//                                "    \"jsonrpc\": \"2.0\",\n" +
-//                                "    \"params\": \n" +
-//                                "        {\n" +
-//                                "            \"acmac\": \"00E0614CA7C6\",\n" +
-//                                "            \"acconf_version\": \"2015-10-28-09-45\"\n" +
-//                                "        }\n" +
-//                                "    }";
-//                        RequestBody formBody = RequestBody.create(JSON,hi);
-////                                new FormBody.Builder()
-////                                .add("account", "android")
-////                                .add("password", "bug")
-////                                .add("username", "XXXX")
-////                                .add("pic", "XXXXX")
-////                                .add("sex", "XXXXX")
-////                                .build();
-//
-//                        Log.d("11111",formBody.toString());
-//
-//                        final Request request = new Request.Builder()
-//                                .url("http://192.168.1.157:81/php/index.php")
-//                                .post(formBody)
-//                                .build();
-////new call
-//                        Call call = mOkHttpClient.newCall(request);
-////请求加入调度
-//                        call.enqueue(new Callback() {
-//                            @Override
-//                            public void onFailure(Call call, IOException e) {
-//                                Log.d("22222", "22222");
-//
-//                            }
-//
-//                            @Override
-//                            public void onResponse(Call call, Response response) throws IOException {
-//                                // 输出返回结果
-//                                Log.d("11111", "11111");
-//
-//                            }
-//                        });
-
                         confirmDialog.dismiss();
-
                     }
 
                     @Override
                     public void doCancel() {
+
+                        Log.d("1231231",mEdit.getText().toString());
+
+
                         confirmDialog.dismiss();
                     }
                 });
@@ -335,40 +303,6 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void run() {//run()在新的线程中运行
             try {
-
-//                //创建okHttpClient对象 get方法
-//                OkHttpClient mOkHttpClient = new OkHttpClient();
-////创建一个Request
-//                final Request request = new Request.Builder()
-//                        .url("http://192.168.1.157:81/php/index.php")
-//                        .build();
-////new call
-//                Call call = mOkHttpClient.newCall(request);
-////请求加入调度
-//                call.enqueue(new Callback()
-//                {
-//                    @Override
-//                    public void onFailure(Call call, IOException e) {
-//                        Log.d("22222","22222");
-//
-//                    }
-//                    @Override
-//                    public void onResponse(Call call, Response response) throws IOException {
-//                        // 输出返回结果
-//                        InputStream input = response.body().byteStream();
-//                        int resLen = 0;
-//                        byte[] res = new byte[1024];
-//                        StringBuilder sb = new StringBuilder();
-//                        while ((resLen = input.read(res)) != -1) {
-//                            sb.append(new String(res, 0, resLen));
-//                        }
-//                        jsonStr = sb.toString();
-//                        Log.d("11111","11111"+jsonStr);
-//
-//                    }
-//                });
-
-
                 URL url = new URL("http://192.168.1.157:81/php/index.php");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setConnectTimeout(10000);
@@ -408,6 +342,56 @@ public class MainActivity extends AppCompatActivity
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    };
+    Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            //创建okHttpClient对象 get方法
+            OkHttpClient mOkHttpClient = new OkHttpClient();
+//创建一个Request
+            RequestBody formBody = new FormBody.Builder()
+                    .add("username", mEdit.getText().toString())
+                    .build();
+
+            Log.d("11111", formBody.toString());
+
+            final Request request = new Request.Builder()
+                    .url("http://192.168.1.157:81/php/add.php")
+                    .post(formBody)
+                    .build();
+//new call
+            Call call = mOkHttpClient.newCall(request);
+//请求加入调度
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.d("22222", "22222");
+
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    // 输出返回结果
+                    InputStream input = response.body().byteStream();
+                    int resLen = 0;
+                    byte[] res = new byte[1024];
+                    StringBuilder sb = new StringBuilder();
+                    while ((resLen = input.read(res)) != -1) {
+                        sb.append(new String(res, 0, resLen));
+                    }
+                    Message msg = mHandler.obtainMessage();
+                    if (sb.toString().equals("success")){
+                        msg.what = 0;
+                        mHandler.sendMessage(msg);
+                    }else {
+                        msg.what = 1;
+                        mHandler.sendMessage(msg);
+                    }
+                    Log.d("11111", "11111" + sb.toString());
+
+                }
+            });
         }
     };
 }

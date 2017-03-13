@@ -16,6 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <EditText
+            android:id="@+id/mUsername"
             android:hint="请输入用户名"
             android:layout_width="130dp"
             android:layout_height="wrap_content"/>
@@ -32,6 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <EditText
+            android:id="@+id/mPassword"
             android:hint="请输入密码"
             android:layout_width="130dp"
             android:layout_height="wrap_content"/>
