@@ -4,12 +4,24 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * Created by Administrator on 2017/3/10.
@@ -24,6 +36,7 @@ public class SendMess extends Dialog {
         private String confirmButtonText;
         private String cacelButtonText;
         private ClickListenerInterface clickListenerInterface;
+    private EditText mSendCon;
 
         public interface ClickListenerInterface {
 
@@ -53,7 +66,7 @@ public class SendMess extends Dialog {
             View view = inflater.inflate(R.layout.dialog, null);
             setContentView(view);
 
-            EditText mSendCon = (EditText) view.findViewById(R.id.sendCon);
+            mSendCon = (EditText) view.findViewById(R.id.sendCon);
 //            TextView tvTitle = (TextView) view.findViewById(R.id.title);
             TextView tvConfirm = (TextView) view.findViewById(R.id.confirm);
             TextView tvCancel = (TextView) view.findViewById(R.id.cancel);
@@ -86,12 +99,63 @@ public class SendMess extends Dialog {
                         clickListenerInterface.doConfirm();
                         break;
                     case R.id.cancel:
-                        clickListenerInterface.doCancel();
+                        Log.d("1231231",mSendCon.getText().toString());
+                        new Thread(mRunnable).start();
+                        SendMess.this.dismiss();
                         break;
                 }
             }
 
         };
 
+    Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            //创建okHttpClient对象 get方法
+            OkHttpClient mOkHttpClient = new OkHttpClient();
+//创建一个Request
+            RequestBody formBody = new FormBody.Builder()
+                    .add("username", mSendCon.getText().toString())
+                    .build();
 
+            Log.d("发送", formBody.toString());
+
+            final Request request = new Request.Builder()
+                    .url("http://192.168.1.157:81/php/add.php")
+                    .post(formBody)
+                    .build();
+//new call
+            Call call = mOkHttpClient.newCall(request);
+//请求加入调度
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.d("失败", "22222");
+
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    // 输出返回结果
+                    InputStream input = response.body().byteStream();
+                    int resLen = 0;
+                    byte[] res = new byte[1024];
+                    StringBuilder sb = new StringBuilder();
+                    while ((resLen = input.read(res)) != -1) {
+                        sb.append(new String(res, 0, resLen));
+                    }
+//                    Message msg = mHandler.obtainMessage();
+//                    if (sb.toString().equals("success")){
+//                        msg.what = 0;
+//                        mHandler.sendMessage(msg);
+//                    }else {
+//                        msg.what = 1;
+//                        mHandler.sendMessage(msg);
+//                    }
+                    Log.d("返回值", "返回值" + sb.toString());
+
+                }
+            });
+        }
+    };
 }

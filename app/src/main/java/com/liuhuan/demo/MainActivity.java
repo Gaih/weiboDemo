@@ -32,21 +32,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
@@ -95,10 +86,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void doCancel() {
 
-                        Log.d("1231231",mEdit.getText().toString());
 
-
-                        confirmDialog.dismiss();
                     }
                 });
 
@@ -344,54 +332,5 @@ public class MainActivity extends AppCompatActivity
             }
         }
     };
-    Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            //创建okHttpClient对象 get方法
-            OkHttpClient mOkHttpClient = new OkHttpClient();
-//创建一个Request
-            RequestBody formBody = new FormBody.Builder()
-                    .add("username", mEdit.getText().toString())
-                    .build();
 
-            Log.d("11111", formBody.toString());
-
-            final Request request = new Request.Builder()
-                    .url("http://192.168.1.157:81/php/add.php")
-                    .post(formBody)
-                    .build();
-//new call
-            Call call = mOkHttpClient.newCall(request);
-//请求加入调度
-            call.enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.d("22222", "22222");
-
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    // 输出返回结果
-                    InputStream input = response.body().byteStream();
-                    int resLen = 0;
-                    byte[] res = new byte[1024];
-                    StringBuilder sb = new StringBuilder();
-                    while ((resLen = input.read(res)) != -1) {
-                        sb.append(new String(res, 0, resLen));
-                    }
-                    Message msg = mHandler.obtainMessage();
-                    if (sb.toString().equals("success")){
-                        msg.what = 0;
-                        mHandler.sendMessage(msg);
-                    }else {
-                        msg.what = 1;
-                        mHandler.sendMessage(msg);
-                    }
-                    Log.d("11111", "11111" + sb.toString());
-
-                }
-            });
-        }
-    };
 }
