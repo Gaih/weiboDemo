@@ -3,6 +3,7 @@ package com.liuhuan.demo;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,7 +37,9 @@ public class SendMess extends Dialog {
         private String confirmButtonText;
         private String cacelButtonText;
         private ClickListenerInterface clickListenerInterface;
+    private Handler mHandler;
     private EditText mSendCon;
+    private static final int ref =2;//获取图片成功的标识
 
         public interface ClickListenerInterface {
 
@@ -45,12 +48,13 @@ public class SendMess extends Dialog {
             public void doCancel();
         }
 
-        public SendMess(Context context, String title, String confirmButtonText, String cacelButtonText) {
+        public SendMess(Context context, Handler mhandler, String confirmButtonText, String cacelButtonText) {
             super(context);
             this.context = context;
 //            this.title = title;
             this.confirmButtonText = confirmButtonText;
             this.cacelButtonText = cacelButtonText;
+            this.mHandler = mhandler;
         }
 
         @Override
@@ -115,7 +119,8 @@ public class SendMess extends Dialog {
             OkHttpClient mOkHttpClient = new OkHttpClient();
 //创建一个Request
             RequestBody formBody = new FormBody.Builder()
-                    .add("username", mSendCon.getText().toString())
+                    .add("username",Login.username)
+                    .add("content", mSendCon.getText().toString())
                     .build();
 
             Log.d("发送", formBody.toString());
@@ -153,9 +158,13 @@ public class SendMess extends Dialog {
 //                        mHandler.sendMessage(msg);
 //                    }
                     Log.d("返回值", "返回值" + sb.toString());
+                    mHandler.obtainMessage(ref).sendToTarget();
 
                 }
             });
+
+
+
         }
     };
 }

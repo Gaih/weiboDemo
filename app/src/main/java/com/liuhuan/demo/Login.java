@@ -14,6 +14,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.tencent.android.tpush.XGIOperateCallback;
+import com.tencent.android.tpush.XGPushManager;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -33,11 +36,12 @@ import okhttp3.Response;
 public class Login extends AppCompatActivity implements View.OnClickListener {
     Context context;
 
-    Button mReg;
-    Button mLogin;
-    EditText mUsername;
-    EditText mPassword;
-    ProgressDialog mDialog;
+    private Button mReg;
+    private Button mLogin;
+    private EditText mUsername;
+    private EditText mPassword;
+    private ProgressDialog mDialog;
+    public static String username;
 
 
     @Override
@@ -50,6 +54,19 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         mReg.setOnClickListener(this);
         mUsername = (EditText) findViewById(R.id.mUsername);
         mPassword = (EditText) findViewById(R.id.mPassword);
+
+        //信鸽推送注册
+        XGPushManager.registerPush(this, "123",new XGIOperateCallback() {
+            @Override
+            public void onSuccess(Object o, int i) {
+                Toast.makeText(context,"TPush"+"注册成功，设备token为：" + o,Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFail(Object o, int i, String s) {
+                Toast.makeText(context,"注册失败，错误码：" + i + ",错误信息：" + s,Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void init() {
@@ -119,6 +136,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     }
                     Message msg = mHandler.obtainMessage();
                     if (sb.toString().equals("success")){
+                        username = mUsername.getText().toString();
                         msg.what = 0;
                         mHandler.sendMessage(msg);
                     }else {

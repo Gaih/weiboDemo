@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final SendMess confirmDialog = new SendMess(MainActivity.this, "确定要退出吗?", "取消", "发送");
+                final SendMess confirmDialog = new SendMess(MainActivity.this, mHandler,"取消", "发送");
                 confirmDialog.show();
                 confirmDialog.setClicklistener(new SendMess.ClickListenerInterface() {
                     @Override
@@ -85,8 +85,7 @@ public class MainActivity extends AppCompatActivity
 
                     @Override
                     public void doCancel() {
-
-
+//                        new Thread(runnable).start();
                     }
                 });
 
@@ -111,9 +110,13 @@ public class MainActivity extends AppCompatActivity
             switch (msg.what) {
                 case SUCC:
                     mRefreshFootAdapter.notifyDataSetChanged();
+                    mSwipe.setRefreshing(false);
                     break;
                 case FAIL:
                     Toast.makeText(MainActivity.this, "无更新", Toast.LENGTH_SHORT).show();
+                    break;
+                case 2:
+                    new Thread(runnable).start();
                     break;
             }
         }
@@ -144,15 +147,15 @@ public class MainActivity extends AppCompatActivity
         mSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
                         new Thread(runnable).start();
                         //数据重新加载完成后，提示数据发生改变，并且设置现在不在刷新
 //                        mRefreshFootAdapter.notifyDataSetChanged();
-                        mSwipe.setRefreshing(false);
-                    }
-                }, 4000);
+//                        mSwipe.setRefreshing(false);
+//                    }
+//                }, 4000);
 
 //                mSwipe.setRefreshing(false);
             }
@@ -325,7 +328,6 @@ public class MainActivity extends AppCompatActivity
                     datas.add(0, userBean);
                 }
                 mHandler.obtainMessage(SUCC, datas).sendToTarget();//向ui线程发送SUCCESS标识和数据
-
 
             } catch (Exception e) {
                 e.printStackTrace();
