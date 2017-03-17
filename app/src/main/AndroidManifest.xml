@@ -47,6 +47,9 @@
                 <!--&lt;!&ndash;<category android:name="android.intent.category.LAUNCHER" />&ndash;&gt;-->
             <!--</intent-filter>-->
         </activity>
+        <activity android:name=".Regiest">
+
+        </activity>
 
         //信鸽推送
         <!-- 【必须】 (2.30及以上版新增)展示通知的activity -->

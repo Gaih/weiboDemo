@@ -112,6 +112,7 @@ public class SendMess extends Dialog {
 
         };
 
+
     Runnable mRunnable = new Runnable() {
         @Override
         public void run() {

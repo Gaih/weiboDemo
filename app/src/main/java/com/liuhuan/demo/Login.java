@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -45,6 +47,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
 
     @Override
+
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         this.context = Login.this;
         super.onCreate(savedInstanceState);
@@ -56,15 +59,15 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         mPassword = (EditText) findViewById(R.id.mPassword);
 
         //信鸽推送注册
-        XGPushManager.registerPush(this, "123",new XGIOperateCallback() {
+        XGPushManager.registerPush(this, "123", new XGIOperateCallback() {
             @Override
             public void onSuccess(Object o, int i) {
-                Toast.makeText(context,"TPush"+"注册成功，设备token为：" + o,Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "TPush" + "注册成功，设备token为：" + o, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFail(Object o, int i, String s) {
-                Toast.makeText(context,"注册失败，错误码：" + i + ",错误信息：" + s,Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "注册失败，错误码：" + i + ",错误信息：" + s, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -80,17 +83,20 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.mReg:
-
+                Intent intent = new Intent(Login.this, Regiest.class);
+                startActivity(intent);
 
                 break;
             case R.id.mLogin:
-                mDialog = new ProgressDialog(Login.this);
-                mDialog.setTitle("登陆");
-                mDialog.setMessage("正在登陆服务器，请稍后...");
-                mDialog.show();
-                new Thread(mRunnable).start();
-
-
+                if (TextUtils.isEmpty(mUsername.getText())||TextUtils.isEmpty(mPassword.getText())){
+                    Snackbar.make(getWindow().getDecorView(), "请输入用户名或密码！", Snackbar.LENGTH_SHORT).show();
+                }else {
+                    mDialog = new ProgressDialog(Login.this);
+                    mDialog.setTitle("登陆");
+                    mDialog.setMessage("正在登陆服务器，请稍后...");
+                    mDialog.show();
+                    new Thread(mRunnable).start();
+                }
                 break;
 
         }
@@ -135,11 +141,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                         sb.append(new String(res, 0, resLen));
                     }
                     Message msg = mHandler.obtainMessage();
-                    if (sb.toString().equals("success")){
-                        username = mUsername.getText().toString();
+                    if (sb.toString().contains("success")) {
+                        String[] name = sb.toString().split("。");
+                        Log.d("用户名:", name[1]);
+                        username= name[1];
                         msg.what = 0;
                         mHandler.sendMessage(msg);
-                    }else {
+                    } else {
                         msg.what = 1;
                         mHandler.sendMessage(msg);
                     }
@@ -149,16 +157,14 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             });
         }
     };
-    Handler mHandler = new Handler(){
-        public void handleMessage(Message msg)
-        {
-            switch(msg.what)
-            {
+    Handler mHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
                 case 0:
                     mDialog.cancel();
                     Intent intent = new Intent(Login.this, MainActivity.class);
                     startActivity(intent);
-                    Toast.makeText(getApplicationContext(), "登录成功！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "登录成功~", Toast.LENGTH_SHORT).show();
                     break;
                 case 1:
                     mDialog.cancel();
@@ -169,4 +175,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
         }
     };
+
+//    public void setUsername(String username) {
+//        this.username = username;
+//    }
+//
+//    public String getUsername() {
+//        return this.username;
+//    }
 }

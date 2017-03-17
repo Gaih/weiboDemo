@@ -100,9 +100,16 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
+        //NavigationView获取控件
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View mView = navigationView.getHeaderView(0);
+        TextView nav_user = (TextView) mView.findViewById(R.id.nav_uesr);
+
+        Login login = new Login();
+        String name = login.username;
+        Log.d("main用户名：",name);
+        nav_user.setText(name);
     }
 
     private Handler mHandler = new Handler() {
