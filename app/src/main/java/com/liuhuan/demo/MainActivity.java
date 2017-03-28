@@ -18,11 +18,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +38,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.liuhuan.demo.R.id.mTime;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
@@ -186,16 +188,17 @@ public class MainActivity extends AppCompatActivity
                 switch (view.getId()) {
 
                     case R.id.mPic:
-                        Toast.makeText(MainActivity.this, "头像", Toast.LENGTH_SHORT).show();
-                        ImageButton mPic = (ImageButton) view.findViewById(R.id.mPic);
-                        mPic.setBackground(getResources().getDrawable(R.drawable.ic_launcher));
+//                        Toast.makeText(MainActivity.this, "头像", Toast.LENGTH_SHORT).show();
+//                        ImageButton mPic = (ImageButton) view.findViewById(R.id.mPic);
+//                        mPic.setBackground(getResources().getDrawable(R.drawable.ic_launcher));
                         break;
                     case R.id.mContent:
-                        Toast.makeText(MainActivity.this, "内容", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, "内容", Toast.LENGTH_SHORT).show();
                         break;
-                    case R.id.mTime:
-                        TextView mTime = (TextView) view.findViewById(R.id.mTime);
-                        mTime.setText(new Date() + "");
+                    case mTime:
+//                        TextView mTime = (TextView) view.findViewById(R.id.mTime);
+//                        mTime.setText(new Date() + "");
+                        break;
                 }
             }
         });
@@ -276,8 +279,8 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
         if (id == R.id.nav_camera) {
+            Toast.makeText(MainActivity.this,"gagag",Toast.LENGTH_SHORT).show();
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
 
@@ -301,7 +304,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void run() {//run()在新的线程中运行
             try {
-                URL url = new URL("http://192.168.1.157:81/php/index.php");
+                URL url = new URL("http://192.168.1.181/php/index.php");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setConnectTimeout(10000);
                 conn.setRequestMethod("GET");
@@ -342,4 +345,20 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
+    private long exitTime = 0;
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
+            if((System.currentTimeMillis()-exitTime) > 2000){
+                Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                exitTime = System.currentTimeMillis();
+            } else {
+                finish();
+                System.exit(0);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }

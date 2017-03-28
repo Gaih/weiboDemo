@@ -85,6 +85,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             case R.id.mReg:
                 Intent intent = new Intent(Login.this, Regiest.class);
                 startActivity(intent);
+                finish();
 
                 break;
             case R.id.mLogin:
@@ -93,6 +94,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 }else {
                     mDialog = new ProgressDialog(Login.this);
                     mDialog.setTitle("登陆");
+
                     mDialog.setMessage("正在登陆服务器，请稍后...");
                     mDialog.show();
                     new Thread(mRunnable).start();
@@ -117,7 +119,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             Log.d("11111", formBody.toString());
 
             final Request request = new Request.Builder()
-                    .url("http://192.168.1.157:81/php/insert.php")
+                    .url("http://192.168.1.181/php/insert.php")
                     .post(formBody)
                     .build();
 //new call
@@ -164,6 +166,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     mDialog.cancel();
                     Intent intent = new Intent(Login.this, MainActivity.class);
                     startActivity(intent);
+                    finish();
                     Toast.makeText(getApplicationContext(), "登录成功~", Toast.LENGTH_SHORT).show();
                     break;
                 case 1:

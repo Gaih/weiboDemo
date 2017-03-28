@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -119,15 +120,21 @@ public class SendMess extends Dialog {
             //创建okHttpClient对象 get方法
             OkHttpClient mOkHttpClient = new OkHttpClient();
 //创建一个Request
+            String content=null;
+            try {
+                content = new String(mSendCon.getText().toString().getBytes("UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             RequestBody formBody = new FormBody.Builder()
                     .add("username",Login.username)
-                    .add("content", mSendCon.getText().toString())
+                    .add("content",content )
                     .build();
 
             Log.d("发送", formBody.toString());
 
             final Request request = new Request.Builder()
-                    .url("http://192.168.1.157:81/php/add.php")
+                    .url("http://192.168.1.181/php/add.php")
                     .post(formBody)
                     .build();
 //new call
